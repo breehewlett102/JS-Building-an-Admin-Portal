@@ -1,27 +1,59 @@
-// Your Code Here
-async function main(){
-let response = await fetch ('http://localhost:3001/listBooks', {
-    method: "GET",
-    headers: null,
-    body: null
-});
+const updateQuantity = async (el, id) => {
+    let sibiling = el.previousSibiling;
 
-let books = await response.json();
-console.log('The Annals of Arathra')
-}
+    console.log(sibiling);
+    let requestBody = {
+        id, quantity: sibiling.value
+    }
 
-async function main(){
-    
-    let response = await fetch('http://localhost:9001/updateBook', {
+    let res = await fetch('http://localhost:3001/updateBook', {
         method: 'PATCH',
         headers: {
-            'Content-Type':'application/json'
+            'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-            "id": 3,
-            "title": "Ledgends of Arathrae"
-        }),
-    });
-    let updatedBook = await response.json();
-    console.log(updatedBook)
+            id, quantity: sibiling.value
+        })
+    })
+
+    console.log(res);
 }
+
+const main = async () => {
+    let root = document.querySelector('#root');
+
+    let res = await fetch ('http://localhost:3001/listBooks')
+    let books = await res.json();
+    console.log(books);
+
+    books.forEach((book) => {
+
+        let id = book.id;
+        let title = book.title;
+        let quantity = book.quantity;
+
+        let wrapper = document.createElement('div');
+        wrapper.setAttribute('class', 'row');
+
+        let bookSpan = document.createElement('span');
+        bookSpan.innerHTML = title;
+        bookSpan.setAttribute('class', 'col')
+
+        let input = document.createElement('input');
+        input.setAttribute('type', 'number');
+        input.setAttribute('class', 'form-control col');
+        input.id = 'input' + id;
+        input.value = quantity;
+
+        let submit = document.createElement('input');
+        submit.setAttribute('type', 'number');
+        submit.setAttribute('class', 'col btn btn primary')
+        submit.value = 'Submit'
+
+        submit.setAttribute('onClick', `updateQuantity(this, ${id})`);
+        wrapper.append(bookSpan, input, submit);
+        root.append(wrapper);
+    })
+}
+
+main();
